@@ -10,6 +10,7 @@
 		FB0552EC1E52326E00F9007D /* SwiftNet.h in Headers */ = {isa = PBXBuildFile; fileRef = FB3E43111E51E2C100F7C066 /* SwiftNet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB0553031E527F3200F9007D /* MNIST.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0553021E527F3200F9007D /* MNIST.swift */; };
 		FB0553041E527F3200F9007D /* MNIST.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0553021E527F3200F9007D /* MNIST.swift */; };
+		FB2FBFDA1E6CA6EC00E36EB4 /* Readme.md in Sources */ = {isa = PBXBuildFile; fileRef = FB2FBFD91E6CA6EC00E36EB4 /* Readme.md */; };
 		FB3E43131E51E2C100F7C066 /* SwiftNet.h in Headers */ = {isa = PBXBuildFile; fileRef = FB3E43111E51E2C100F7C066 /* SwiftNet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB3E43231E51E65E00F7C066 /* SwiftNetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3E43221E51E65E00F7C066 /* SwiftNetTests.swift */; };
 		FB3E43251E51E65F00F7C066 /* SwiftNet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB3E43011E51E2AD00F7C066 /* SwiftNet.framework */; };
@@ -29,6 +30,7 @@
 
 /* Begin PBXFileReference section */
 		FB0553021E527F3200F9007D /* MNIST.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MNIST.swift; sourceTree = "<group>"; };
+		FB2FBFD91E6CA6EC00E36EB4 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		FB3E43011E51E2AD00F7C066 /* SwiftNet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftNet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB3E430F1E51E2C100F7C066 /* SwiftNet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftNet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB3E43111E51E2C100F7C066 /* SwiftNet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftNet.h; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 		FB3E42F51E51E28100F7C066 = {
 			isa = PBXGroup;
 			children = (
+				FB2FBFD91E6CA6EC00E36EB4 /* Readme.md */,
 				FB0553011E527F3200F9007D /* Examples */,
 				FB3E43171E51E41300F7C066 /* Sources */,
 				FB3E43211E51E65E00F7C066 /* SwiftNetTests */,
@@ -265,6 +268,7 @@
 			files = (
 				FB3E432C1E51E6FE00F7C066 /* Network.swift in Sources */,
 				FB0553031E527F3200F9007D /* MNIST.swift in Sources */,
+				FB2FBFDA1E6CA6EC00E36EB4 /* Readme.md in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

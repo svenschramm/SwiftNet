@@ -410,20 +410,20 @@ public class Node: NSObject, NSCoding {
         return OperatorNode(inputNodes: [data], name: name ?? Node.uniqueName(withPrefix: "activation"), operator: op)
     }
     
-    public class func fullyConnected(_ data: Node, _ bias: Node? = nil, _ weights: Node? = nil, name: String? = nil, units: Int) -> OperatorNode {
+    public class func fullyConnected(_ data: Node, _ weights: Node? = nil, _ bias: Node? = nil, name: String? = nil, units: Int) -> OperatorNode {
         let name = name ?? Node.uniqueName(withPrefix: "fullyConnected")
-        let bias = bias ?? VariableNode(name: "\(name)_bias", attributes: ["initializer": "zero"])
         let weights = weights ?? VariableNode(name: "\(name)_weights", attributes: ["initializer": "xavier"])
+        let bias = bias ?? VariableNode(name: "\(name)_bias", attributes: ["initializer": "zero"])
         let op = FullyConnectedOperator(units: units)
-        return OperatorNode(inputNodes: [data, bias, weights], name: name, operator: op)
+        return OperatorNode(inputNodes: [data, weights, bias], name: name, operator: op)
     }
     
-    public class func convolution(_ data: Node, _ bias: Node? = nil, _ weights: Node? = nil, name: String? = nil, kernelWidth: Int, kernelHeight: Int, xStride: Int = 1, yStride: Int = 1, xPadding: Int = 0, yPadding: Int = 0, filters: Int) -> OperatorNode {
+    public class func convolution(_ data: Node, _ weights: Node? = nil, _ bias: Node? = nil, name: String? = nil, kernelWidth: Int, kernelHeight: Int, xStride: Int = 1, yStride: Int = 1, xPadding: Int = 0, yPadding: Int = 0, filters: Int) -> OperatorNode {
         let name = name ?? Node.uniqueName(withPrefix: "convolution")
-        let bias = bias ?? VariableNode(name: "\(name)_bias", attributes: ["initializer": "zero"])
         let weights = weights ?? VariableNode(name: "\(name)_weights", attributes: ["initializer": "xavier"])
+        let bias = bias ?? VariableNode(name: "\(name)_bias", attributes: ["initializer": "zero"])
         let op = ConvolutionOperator(kernelWidth: kernelWidth, kernelHeight: kernelHeight, xStride: xStride, yStride: yStride, xPadding: xPadding, yPadding: yPadding, filters: filters)
-        return OperatorNode(inputNodes: [data, bias, weights], name: name, operator: op)
+        return OperatorNode(inputNodes: [data, weights, bias], name: name, operator: op)
     }
     
     public class func pooling(_ data: Node, name: String? = nil, poolingFunction: PoolingFunction, kernelWidth: Int, kernelHeight: Int, xStride: Int = 1, yStride: Int = 1, xPadding: Int = 0, yPadding: Int = 0) -> OperatorNode {
@@ -846,29 +846,29 @@ public class FullyConnectedOperator: Operator {
         precondition(inShapes[0] != nil)
         precondition(inShapes[0]!.count == 1)
         let dataShape = inShapes[0]
-        let biasShape = [units]
         let weightsShape = [units, inShapes[0]![0]]
-        let outShapes = (input: [dataShape, biasShape, weightsShape], output: [units])
+        let biasShape = [units]
+        let outShapes = (input: [dataShape, weightsShape, biasShape], output: [units])
         return outShapes
     }
     
     public override func forward(input: [NDArray?]) -> NDArray {
         let data = input[0]!
-        let bias = input[1]!
-        let weights = input[2]!
+        let weights = input[1]!
+        let bias = input[2]!
         let output = add(gemv(weights, data), bias)
         return output
     }
     
     public override func backward(delta: NDArray, input: [NDArray?], output: NDArray) -> [NDArray?]  {
         let data = input[0]!
-        let weights = input[2]!
+        let weights = input[1]!
         
         let weightsGradient = outer(delta, data)
         let biasGradient = delta
         let dataGradient = gemv(weights, delta, transposeA: true)
 
-        return [dataGradient, biasGradient, weightsGradient]
+        return [dataGradient, weightsGradient, biasGradient]
     }
 }
 
@@ -926,9 +926,9 @@ public class ConvolutionOperator: Operator {
         let outWidth = Int((inWidth + xPadding * 2 - kernelWidth) / xStride) + 1
         let outHeight = Int((inHeight + yPadding * 2 - kernelHeight) / yStride) + 1
         let dataShape = inShapes[0]
-        let biasShape = [outChannels]
         let weightsShape = [outChannels, inChannels, kernelHeight, kernelWidth]
-        let outShapes = (input: [dataShape, biasShape, weightsShape], output: [outChannels, outHeight, outWidth])
+        let biasShape = [outChannels]
+        let outShapes = (input: [dataShape, weightsShape, biasShape], output: [outChannels, outHeight, outWidth])
         return outShapes
     }
     
@@ -1009,8 +1009,8 @@ public class ConvolutionOperator: Operator {
     
     public override func forward(input: [NDArray?]) -> NDArray {
         let data = input[0]!
-        let bias = input[1]!
-        let weights = input[2]!
+        let weights = input[1]!
+        let bias = input[2]!
         
         let outChannels = filters
         let inChannels = data.shape[0]
@@ -1024,8 +1024,8 @@ public class ConvolutionOperator: Operator {
         for k in 0..<outChannels {
             elements.append(contentsOf: [Float32](repeating: bias.elements[k], count: outWidth * outHeight))
         }
-        let reshapedBias = NDArray(shape: [outChannels, outHeight, outWidth], elements: elements)
         let reshapedWeights = weights.reshaped([outChannels, kernelWidth * kernelHeight * inChannels])
+        let reshapedBias = NDArray(shape: [outChannels, outHeight, outWidth], elements: elements)
 
         let output = gemm(reshapedWeights, reshapedData, transposeB: true).reshaped([outChannels, outHeight, outWidth])
         return add(output, reshapedBias)
@@ -1066,10 +1066,10 @@ public class ConvolutionOperator: Operator {
     
     public override func backward(delta: NDArray, input: [NDArray?], output: NDArray) -> [NDArray?] {
         let data = input[0]!
-        let weights = input[2]!
+        let weights = input[1]!
 
-        let biasGradient = computeBiasGradient(delta: delta)
         let weightsGradient = computeWeightsGradient(data: data, delta: delta)
+        let biasGradient = computeBiasGradient(delta: delta)
         
         let inChannels = data.shape[0]
         let inHeight = data.shape[1]
@@ -1082,7 +1082,7 @@ public class ConvolutionOperator: Operator {
         let reshapedWeights = weights.reshaped([outChannels, kernelWidth * kernelHeight * inChannels])
         let dataGradient = rowsToImage(gemm(reshapedDelta, reshapedWeights, transposeA: true), imageWidth: inWidth, imageHeight: inHeight)
 
-        return [dataGradient, biasGradient, weightsGradient]
+        return [dataGradient, weightsGradient, biasGradient]
     }
 }
 

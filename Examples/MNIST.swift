@@ -80,7 +80,7 @@ public struct MNIST {
     }
     
     /*
-     please download and unzip these files first before executing run
+     Please download and unzip these files before executing run:
      http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
      http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
      http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
@@ -90,10 +90,10 @@ public struct MNIST {
     public static func run() {
         let input = Node.variable(name: "input")
         let labels = Node.variable(name: "labels")
-        let fullyConnected1 = Node.fullyConnected(input, units: 128)
-        let activation = Node.activation(fullyConnected1, activationFunction: .rectifiedLinear)
-        let fullyConnected2 = Node.fullyConnected(activation, units: 10)
-        let output = Node.softmaxOutput(fullyConnected2, labels)
+        var output = Node.fullyConnected(input, units: 128)
+        output = Node.activation(output, activationFunction: .rectifiedLinear)
+        output = Node.fullyConnected(output, units: 10)
+        output = Node.softmaxOutput(output, labels)
         let network = Network(outputNodes: [output])
         
         let trainingData = loadTrainingData()

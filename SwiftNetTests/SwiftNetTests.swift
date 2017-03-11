@@ -22,10 +22,10 @@ class SwiftNetTests: XCTestCase {
                                                         0.2, 0.3, 0.4, 0.5,
                                                         0.3, 0.4, 0.5, 0.6,
                                                         0.4, 0.5, 0.6, 0.7])
-        let bias = NDArray([0.5])
         let weights = NDArray(shape: [1, 2, 2, 2], elements: [0.1, 0.2, 0.3, 0.4, 0.1, 0.2, 0.3, 0.4])
+        let bias = NDArray([0.5])
         
-        let input = [data, bias, weights]
+        let input = [data, weights, bias]
         let output = node.op.forward(input: input)
         
         let gradients = node.op.backward(delta: NDArray(shape: output.shape, elements: [Float32](repeating: 1.0, count: output.size)), input: input, output: output)
@@ -61,15 +61,16 @@ class SwiftNetTests: XCTestCase {
         XCTAssertEqualWithAccuracy(gradients[0]!.elements[18], 0.3, accuracy: 0.00001)
         XCTAssertEqualWithAccuracy(gradients[0]!.elements[19], 0.2, accuracy: 0.00001)
     
-        XCTAssertEqualWithAccuracy(gradients[1]!.elements[0], 9.0, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[0], 2.7, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[1], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[2], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[3], 4.5, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[4], 2.7, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[5], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[6], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[7], 4.5, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[0], 2.7, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[1], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[2], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[3], 4.5, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[4], 2.7, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[5], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[6], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[7], 4.5, accuracy: 0.00001)
+        
+        XCTAssertEqualWithAccuracy(gradients[2]!.elements[0], 9.0, accuracy: 0.00001)
     }
     
     func testConvolutionWithMultipleOutputChannels() {
@@ -79,10 +80,10 @@ class SwiftNetTests: XCTestCase {
                                                         0.2, 0.3, 0.4, 0.5,
                                                         0.3, 0.4, 0.5, 0.6,
                                                         0.4, 0.5, 0.6, 0.7])
-        let bias = NDArray([0.5, 0.5])
         let weights = NDArray(shape: [2, 1, 2, 2], elements: [0.1, 0.2, 0.3, 0.4, 0.1, 0.2, 0.3, 0.4])
+        let bias = NDArray([0.5, 0.5])
         
-        let input = [data, bias, weights]
+        let input = [data, weights, bias]
         let output = node.op.forward(input: input)
 
         let gradients = node.op.backward(delta: NDArray(shape: output.shape, elements: [Float32](repeating: 1.0, count: output.size)), input: input, output: output)
@@ -102,16 +103,18 @@ class SwiftNetTests: XCTestCase {
         XCTAssertEqualWithAccuracy(gradients[0]!.elements[5], 2.0, accuracy: 0.00001)
         XCTAssertEqualWithAccuracy(gradients[0]!.elements[6], 2.0, accuracy: 0.00001)
         XCTAssertEqualWithAccuracy(gradients[0]!.elements[7], 1.2, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[1]!.elements[0], 9.0, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[1]!.elements[1], 9.0, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[0], 2.7, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[1], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[2], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[3], 4.5, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[4], 2.7, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[5], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[6], 3.6, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[7], 4.5, accuracy: 0.00001)
+        
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[0], 2.7, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[1], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[2], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[3], 4.5, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[4], 2.7, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[5], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[6], 3.6, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[7], 4.5, accuracy: 0.00001)
+        
+        XCTAssertEqualWithAccuracy(gradients[2]!.elements[0], 9.0, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[2]!.elements[1], 9.0, accuracy: 0.00001)
     }
     
     func testPooling() {
@@ -232,10 +235,10 @@ class SwiftNetTests: XCTestCase {
         let node = Node.fullyConnected(Node.variable(name: "input"), units: 3)
         
         let data = NDArray(shape: [2], elements: [0.1, 0.2])
-        let bias = NDArray([0.1, 0.2, 0.3])
         let weights = NDArray(shape: [3, 2], elements: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+        let bias = NDArray([0.1, 0.2, 0.3])
         
-        let input = [data, bias, weights]
+        let input = [data, weights, bias]
         let output = node.op.forward(input: input)
 
         let gradients = node.op.backward(delta: NDArray(shape: output.shape, elements: [Float32](repeating: 1.0, count: output.size)), input: input, output: output)
@@ -245,15 +248,15 @@ class SwiftNetTests: XCTestCase {
         XCTAssertEqualWithAccuracy(output.elements[2], 0.47, accuracy: 0.00001)
         XCTAssertEqualWithAccuracy(gradients[0]!.elements[0], 0.9, accuracy: 0.00001)
         XCTAssertEqualWithAccuracy(gradients[0]!.elements[1], 1.2, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[1]!.elements[0], 1.0, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[1]!.elements[1], 1.0, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[1]!.elements[2], 1.0, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[0], 0.1, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[1], 0.2, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[2], 0.1, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[3], 0.2, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[4], 0.1, accuracy: 0.00001)
-        XCTAssertEqualWithAccuracy(gradients[2]!.elements[5], 0.2, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[0], 0.1, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[1], 0.2, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[2], 0.1, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[3], 0.2, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[4], 0.1, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[1]!.elements[5], 0.2, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[2]!.elements[0], 1.0, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[2]!.elements[1], 1.0, accuracy: 0.00001)
+        XCTAssertEqualWithAccuracy(gradients[2]!.elements[2], 1.0, accuracy: 0.00001)
     }
     
     func testJoin() {
